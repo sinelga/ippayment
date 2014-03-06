@@ -12,6 +12,6 @@ func defaultHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
     http.HandleFunc("/", defaultHandler)
-    http.ListenAndServe(":8080", nil)
+    http.ListenAndServe(":31780", nil)
 }
 
