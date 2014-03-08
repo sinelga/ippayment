@@ -25,13 +25,16 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	msisdn := req.Header.Get("X-UP-CALLING-LINE-ID")
 
 	golog.Info("msisdn " + msisdn)
-	
+
 	callback := req.URL.Query().Get("callback")
 	//	fmt.Fprintf(w, "callback ",r.URL.RawQuery)
 	req.Header.Set("Content-Type", "application/json")
-	jsonstr := jsonresponse.Response{"success": true, "msisdn": msisdn}
-	fmt.Fprint(resp, callback+"("+jsonstr.String()+");")
-	
+	//	var jsonstr map[string]interface{}
+	if callback != "" {
+		jsonstr := jsonresponse.Response{"success": true, "msisdn": msisdn}
+		fmt.Fprint(resp, callback+"("+jsonstr.String()+");")
+	}
+	http.Error(resp, "Too Many Requests", 429)
 
 }
 
