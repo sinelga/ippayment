@@ -26,12 +26,15 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	golog.Info("msisdn " + msisdn)
 	callback := req.URL.Query().Get("callback")
 	
+	req.Header.Set("Content-Type", "application/json")
 	if callback != ""  && msisdn != "" {
-		req.Header.Set("Content-Type", "application/json")
-		jsonstr := jsonresponse.Response{"success": true, "msisdn": msisdn}
-		fmt.Fprint(resp, callback+"("+jsonstr.String()+");")
+		
+		jsonstrtrue := jsonresponse.Response{"success": true, "msisdn": msisdn}
+		fmt.Fprint(resp, callback+"("+jsonstrtrue.String()+");")
 	} else {
-		http.Error(resp, "Not Sonera?!", 429)
+		jsonstrfalse := jsonresponse.Response{"success": false, "msisdn": ""}
+		fmt.Fprint(resp, callback+"("+jsonstrfalse.String()+");")
+		
 	}
 
 }
