@@ -33,8 +33,9 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	if callback != "" {
 		jsonstr := jsonresponse.Response{"success": true, "msisdn": msisdn}
 		fmt.Fprint(resp, callback+"("+jsonstr.String()+");")
+	} else {
+		http.Error(resp, "Too Many Requests", 429)
 	}
-	http.Error(resp, "Too Many Requests", 429)
 
 }
 
