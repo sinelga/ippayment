@@ -8,8 +8,8 @@ import (
 	"net"
 	"net/http"
 	"net/http/fcgi"
-	//    "net/url"
 )
+
 
 type FastCGIServer struct{}
 
@@ -27,14 +27,14 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	callback := req.URL.Query().Get("callback")
 	
 	req.Header.Set("Content-Type", "application/json")
+	
 	if callback != ""  && msisdn != "" {
 		
 		jsonstrtrue := jsonresponse.Response{"success": true, "msisdn": msisdn}
 		fmt.Fprint(resp, callback+"("+jsonstrtrue.String()+");")
 	} else {
 		jsonstrfalse := jsonresponse.Response{"success": false, "msisdn": ""}
-		fmt.Fprint(resp, callback+"("+jsonstrfalse.String()+");")
-		
+		fmt.Fprint(resp, callback+"("+jsonstrfalse.String()+");")		
 	}
 
 }
