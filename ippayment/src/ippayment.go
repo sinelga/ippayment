@@ -24,8 +24,15 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 	msisdn := req.Header.Get("X-UP-CALLING-LINE-ID")
 	golog.Info("msisdn " + msisdn)
-	callback := req.URL.Query().Get("callback")
 	
+	callback := req.URL.Query().Get("callback")
+	site := req.URL.Query().Get("site")
+	id := req.URL.Query().Get("id")
+	resource := req.URL.Query().Get("resource")
+	themes := req.URL.Query().Get("themes")
+	
+	golog.Info("id: "+id+" site: "+site+" resource: "+resource+" themes: "+themes)
+		
 	req.Header.Set("Content-Type", "application/json")
 	
 	if callback != ""  && msisdn != "" {
