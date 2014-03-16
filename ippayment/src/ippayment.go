@@ -8,6 +8,8 @@ import (
 	"net"
 	"net/http"
 	"net/http/fcgi"
+	"github.com/garyburd/redigo/redis"
+	"memdb"
 )
 
 
@@ -21,6 +23,13 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal("error writing syslog!!")
 	}
+	
+	c, err := redis.Dial("tcp", ":6379")
+	if err != nil {
+	
+		golog.Crit(err.Error())
+		
+	}
 
 	msisdn := req.Header.Get("X-UP-CALLING-LINE-ID")
 	golog.Info("msisdn " + msisdn)
@@ -31,6 +40,8 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	resource := req.URL.Query().Get("resource")
 	themes := req.URL.Query().Get("themes")
 	
+//	record := []string{id,site,themes,resource}
+	
 	golog.Info("id: "+id+" site: "+site+" resource: "+resource+" themes: "+themes)
 		
 	req.Header.Set("Content-Type", "application/json")
@@ -39,9 +50,15 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		
 		jsonstrtrue := jsonresponse.Response{"success": true, "msisdn": msisdn}
 		fmt.Fprint(resp, callback+"("+jsonstrtrue.String()+");")
+		
+		record := []string{id,msisdn,site,themes,resource}
+		memdb.InsertHit(*golog,c,record)
+		
 	} else {
 		jsonstrfalse := jsonresponse.Response{"success": false, "msisdn": ""}
-		fmt.Fprint(resp, callback+"("+jsonstrfalse.String()+");")		
+		fmt.Fprint(resp, callback+"("+jsonstrfalse.String()+");")
+		
+				
 	}
 
 }
