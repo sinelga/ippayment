@@ -46,7 +46,7 @@ func main() {
 		golog.Crit(err.Error())
 	}
 	
-	elaborateallhits.ElabAllHits(*golog,c,collection)
+	elaborateallhits.ElabAllHits(*golog,c,*tdDB,collection)
 	
 
 }
