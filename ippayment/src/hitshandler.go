@@ -8,6 +8,8 @@ import (
 	"log"
 	"log/syslog"
 	"elaborateallhits"
+	"time"
+	"math/rand"
 )
 
 const APP_VERSION = "0.1"
@@ -18,8 +20,10 @@ func main() {
 	flag.Parse() // Scan the arguments list
 
 	if *versionFlag {
-		fmt.Println("Version:", APP_VERSION)
+		fmt.Println("Version:", APP_VERSION)		
 	}
+	rand.Seed(time.Now().UTC().UnixNano())
+	
 	dir := "tiedotDB"
 	
 	golog, err := syslog.New(syslog.LOG_ERR, "golog")
@@ -47,6 +51,8 @@ func main() {
 	}
 	
 	elaborateallhits.ElabAllHits(*golog,c,*tdDB,collection)
+	
+	
 	
 
 }

@@ -12,10 +12,10 @@ import (
 func InsertHit(golog syslog.Writer, c redis.Conn, record []string) {
 
 	nowUnix :=time.Now().Unix()
-	nowUnixInt := int(nowUnix)
+//	nowUnixInt := int(nowUnix)
 
 	hit := domains.Hits{
-		Created:  nowUnixInt,
+		Created:  nowUnix,
 		Id:       record[0],
 		Msisdn:   record[1],
 		Site:     record[2],

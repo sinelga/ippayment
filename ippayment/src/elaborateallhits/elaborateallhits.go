@@ -18,14 +18,11 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 
 	} else {
 
-		if quan_hits > 1 {
+		if quan_hits > 0 {
 
 			for i := 0; i < quan_hits; i++ {
 
-				println(i)
-
 				var hit domains.Hits
-//				type hittype domains.Hits
 
 				bhit, _ := redis.Bytes(c.Do("RPOP", "hits"))
 
@@ -40,33 +37,68 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 
 					println("create ", hit.Msisdn)
 					if err := tdDB.Create(hit.Msisdn, 2); err != nil {
-						//							panic(err)
+
 						golog.Crit(err.Error())
 					} else {
 
 						collections = append(collections, hit.Msisdn)
 
+						msisdn := tdDB.Use(hit.Msisdn)
+						if err := msisdn.Index([]string{"Created"}); err != nil {
+							panic(err)
+						}
+//						if err := msisdn.Index([]string{"Id"}); err != nil {
+//							panic(err)
+//						}						
+//						if err := msisdn.Index([]string{"Site"}); err != nil {
+//							panic(err)
+//						}						
+//						if err := msisdn.Index([]string{"Themes"}); err != nil {
+//							panic(err)
+//						}						
+//						if err := msisdn.Index([]string{"Resource"}); err != nil {
+//							panic(err)
+//						}						
+						if err := msisdn.Index([]string{"ColCreated"}); err != nil {
+							panic(err)
+						}
+						
+
+						msisdn.Insert(map[string]interface{}{
+							"ColCreated":  hit.Created,
+							"ColUpdated":  hit.Created,
+							"ColThemes":   hit.Themes,
+							"ColResource": hit.Resource,
+							"ColHits":     0,
+						})
+
+						_, err := msisdn.Insert(map[string]interface{}{
+							"Created":  hit.Created,
+							"Id":       hit.Id,
+							"Site":     hit.Site,
+							"Themes":   hit.Themes,
+							"Resource": hit.Resource,
+						})
+
+						if err != nil {
+							panic(err)
+						}
+
 					}
 
 				} else {
 
-					println("Update ", hit.Msisdn)
+					println("Update ", hit.Msisdn, hit.Created)
 					msisdn := tdDB.Use(hit.Msisdn)
-					docID, err := msisdn.Insert(map[string]interface{}{
-						"Created": hit.Created,
-						"Id": hit.Id,
-						"Site": hit.Site,
-						"Themes": hit.Themes,
+					_, err := msisdn.Insert(map[string]interface{}{
+						"Created":  hit.Created,
+						"Id":       hit.Id,
+						"Site":     hit.Site,
+						"Themes":   hit.Themes,
 						"Resource": hit.Resource,
-					
 					})
-
 					if err != nil {
 						panic(err)
-					} else {
-						
-						println(docID)
-					
 					}
 
 				}
@@ -80,6 +112,7 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 }
 
 func insertHit(golog syslog.Writer, tdDB db.DB, hit domains.Hits) {
+
 	//		msisdn :=
 	//		docID, err :=sites.Insert(map[string]hit)
 	//
