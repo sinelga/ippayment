@@ -49,15 +49,21 @@ func main() {
 		if err := db.EvalQuery(query, phonenumcol, &queryResult); err != nil {
 			panic(err)
 		}
+		var col domains.Collection
 		for id := range queryResult {
 			phonenumcol.Read(id, &readBack)
-			fmt.Println(readBack)
+			//			fmt.Println(readBack)
+
+			colval := readBack.(map[string]interface{})
+
+			err := mapstructure.Decode(colval, &col)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("DECODE ", col.ColResource)
 
 		}
 
-		//		queryStr := `["all"]`
-		//		queryStr := `{"has": ["Created","Id","Site","Themes","Resource"]}`
-		//		queryStr := `{"has": ["Created","Id","Site","Themes","Resource"],"limit":1}`
 		queryStr = `{"has": ["Created"],"limit":1000}`
 
 		json.Unmarshal([]byte(queryStr), &query)
@@ -75,58 +81,10 @@ func main() {
 
 			vals := readBack.(map[string]interface{})
 
-//			var result domains.Hits
-
 			err := mapstructure.Decode(vals, &hit)
 			if err != nil {
 				panic(err)
 			}
-//			fmt.Println( result.Created)
-//			fmt.Printf("%#v", result)
-			//			var md domains.Metadata
-			//
-			//			var result domains.Hits
-			//
-			//			config := domains.DecoderConfig{
-			//				Metadata: &md,
-			//				Result:   &result,
-			//			}
-			//
-			//			decoder, err := mapstructure.NewDecoder(&config)
-			//			if err != nil {
-			//				panic(err)
-			//			}
-
-//			for k, v := range vals {
-//
-//				switch vv := v.(type) {
-//				case string:
-//					fmt.Println(k, "is string", vv)
-//				case int:
-//					fmt.Println(k, "is int", vv)
-//				case []interface{}:
-//					fmt.Println(k, "is an array:")
-//					for i, u := range vv {
-//						fmt.Println(i, u)
-//					}
-//				default:
-//					fmt.Println(k, "is of a type I don't know how to handle")
-//				}
-//
-//			}
-
-//			created := vals["Created"].(float64)
-//			createdint64 := int64(created)
-//			id := vals["Id"].(string)
-//			site := vals["Site"].(string)
-//			themes := vals["Themes"].(string)
-//			resource := vals["Resource"].(string)
-
-//			hit.Created = createdint64
-//			hit.Id = id
-//			hit.Site = site
-//			hit.Themes = themes
-//			hit.Resource = resource
 
 			hitsarr = append(hitsarr, hit)
 
@@ -138,6 +96,24 @@ func main() {
 
 			createddate := time.Unix(hit.Created, 0)
 			fmt.Println(createddate, hit.Id, hit.Site, hit.Themes, hit.Resource)
+
+		}
+
+		if col.ColResource == "mobilephone" {
+
+			queryStr = `{"has": ["SmsCreated"],"limit":1000}`
+
+			json.Unmarshal([]byte(queryStr), &query)
+			queryResult = make(map[uint64]struct{})
+			if err := db.EvalQuery(query, phonenumcol, &queryResult); err != nil {
+				panic(err)
+			}
+			for id := range queryResult {
+
+				phonenumcol.Read(id, &readBack)
+				fmt.Println(readBack)
+
+			}
 
 		}
 

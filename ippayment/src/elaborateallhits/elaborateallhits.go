@@ -3,11 +3,15 @@ package elaborateallhits
 import (
 	//"log"
 	"checkcolexist"
+	"checkindex"
 	"domains"
 	"encoding/json"
 	"github.com/HouzuoGuo/tiedot/db"
 	"github.com/garyburd/redigo/redis"
+	"github.com/mitchellh/mapstructure"
 	"log/syslog"
+	"pushsmsout"
+	"time"
 )
 
 func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []string) {
@@ -17,6 +21,8 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 		golog.Crit(err.Error())
 
 	} else {
+
+		nowunix := time.Now().Unix()
 
 		if quan_hits > 0 {
 
@@ -43,26 +49,27 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 
 						collections = append(collections, hit.Msisdn)
 
+						checkindex.CheckIndx(golog, tdDB, hit)
+
 						msisdn := tdDB.Use(hit.Msisdn)
-						if err := msisdn.Index([]string{"Created"}); err != nil {
-							panic(err)
-						}
-//						if err := msisdn.Index([]string{"Id"}); err != nil {
-//							panic(err)
-//						}						
-//						if err := msisdn.Index([]string{"Site"}); err != nil {
-//							panic(err)
-//						}						
-//						if err := msisdn.Index([]string{"Themes"}); err != nil {
-//							panic(err)
-//						}						
-//						if err := msisdn.Index([]string{"Resource"}); err != nil {
-//							panic(err)
-//						}						
-						if err := msisdn.Index([]string{"ColCreated"}); err != nil {
-							panic(err)
-						}
-						
+						//						if err := msisdn.Index([]string{"Created"}); err != nil {
+						//							panic(err)
+						//						}
+						//						if err := msisdn.Index([]string{"Id"}); err != nil {
+						//							panic(err)
+						//						}
+						//						if err := msisdn.Index([]string{"Site"}); err != nil {
+						//							panic(err)
+						//						}
+						//						if err := msisdn.Index([]string{"Themes"}); err != nil {
+						//							panic(err)
+						//						}
+						//						if err := msisdn.Index([]string{"Resource"}); err != nil {
+						//							panic(err)
+						//						}
+						//						if err := msisdn.Index([]string{"ColCreated"}); err != nil {
+						//							panic(err)
+						//						}
 
 						msisdn.Insert(map[string]interface{}{
 							"ColCreated":  hit.Created,
@@ -72,7 +79,7 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 							"ColHits":     0,
 						})
 
-						_, err := msisdn.Insert(map[string]interface{}{
+						msisdn.Insert(map[string]interface{}{
 							"Created":  hit.Created,
 							"Id":       hit.Id,
 							"Site":     hit.Site,
@@ -80,8 +87,23 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 							"Resource": hit.Resource,
 						})
 
-						if err != nil {
-							panic(err)
+						if hit.Resource == "mobilephone" {
+
+							smsout := domains.SmsOut{
+								SmsCreated: nowunix,
+								Msisdn:     hit.Msisdn,
+								From:       "070095943",
+								Text:       "",
+							}
+							pushsmsout.PushOut(golog, c, smsout)
+
+							msisdn.Insert(map[string]interface{}{
+								"SmsCreated": smsout.SmsCreated,
+								"Msisdn":     smsout.Msisdn,
+								"From":       smsout.From,
+								"Text":       smsout.Text,
+							})
+
 						}
 
 					}
@@ -89,6 +111,7 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 				} else {
 
 					println("Update ", hit.Msisdn, hit.Created)
+
 					msisdn := tdDB.Use(hit.Msisdn)
 					_, err := msisdn.Insert(map[string]interface{}{
 						"Created":  hit.Created,
@@ -101,6 +124,42 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 						panic(err)
 					}
 
+					var query interface{}
+					var readBack interface{}
+					queryStr := `{"has": ["ColCreated"],"limit":1000}`
+
+					json.Unmarshal([]byte(queryStr), &query)
+					queryResult := make(map[uint64]struct{})
+					if err := db.EvalQuery(query, msisdn, &queryResult); err != nil {
+
+						golog.Crit(err.Error())
+						//			tdDB.Drop(name)
+
+					}
+
+					for id := range queryResult {
+						var collection domains.Collection
+						msisdn.Read(id, &readBack)
+						vals := readBack.(map[string]interface{})
+						err := mapstructure.Decode(vals, &collection)
+						if err != nil {
+							panic(err)
+						}
+						println("update2 ", collection.ColCreated)
+
+						err = msisdn.Update(id, map[string]interface{}{
+							"ColCreated":  collection.ColCreated,
+							"ColUpdated":  nowunix,
+							"ColThemes":   collection.ColThemes,
+							"ColResource": collection.ColResource,
+							"ColHits":     collection.ColHits + 1,
+						})
+						if err != nil {
+							panic(err)
+						}
+
+					}
+
 				}
 
 			}
@@ -111,13 +170,4 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 
 }
 
-func insertHit(golog syslog.Writer, tdDB db.DB, hit domains.Hits) {
 
-	//		msisdn :=
-	//		docID, err :=sites.Insert(map[string]hit)
-	//
-	//			if err != nil {
-	//		panic(err)
-	//	}
-
-}
