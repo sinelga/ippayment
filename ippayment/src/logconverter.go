@@ -55,7 +55,7 @@ func main() {
 		}
 
 		if !nextline {
-			if len(linesplit) > 11 {
+			if len(linesplit) > 11 && msisdn !="" {
 				if linesplit[12] == "adult" {
 					outline := "curl -G -H \"X-UP-CALLING-LINE-ID: " + msisdn + "\" -d \"site=" + linesplit[8] + "\" -d \"id=" + linesplit[6] + "\" -d \"resource=" + linesplit[10] + "\" -d \"themes=adult\" -d \"provider=sonera\" 127.0.0.1/sonera?callback=lslslslsl"
 					//			fmt.Println("curl -G -H \"X-UP-CALLING-LINE-ID: \"",msisdn,linesplit[6],linesplit[8],linesplit[10],linesplit[12])
