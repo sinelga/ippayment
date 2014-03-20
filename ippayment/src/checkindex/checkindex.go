@@ -6,14 +6,14 @@ import (
 	"log/syslog"
 )
 
-func CheckIndx(golog syslog.Writer, tdDB db.DB, hit domains.Hits) {
+func CheckIndx(golog syslog.Writer, tdDB db.DB, hit domains.Hit) {
 
 	msisdn := tdDB.Use(hit.Msisdn)
 
 	var indexarr []string
 
 	for index := range msisdn.SecIndexes {
-		//		fmt.Printf("I have a collection called %s\n", name)
+	
 		indexarr = append(indexarr, index)
 	}
 
@@ -35,4 +35,8 @@ func CheckIndx(golog syslog.Writer, tdDB db.DB, hit domains.Hits) {
 		}
 
 	}
+	
+	
+//	msisdn.Close()
+	
 }

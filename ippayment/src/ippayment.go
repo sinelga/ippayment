@@ -39,6 +39,7 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	id := req.URL.Query().Get("id")
 	resource := req.URL.Query().Get("resource")
 	themes := req.URL.Query().Get("themes")
+	provider :=req.URL.Query().Get("provider")
 	
 //	record := []string{id,site,themes,resource}
 	
@@ -46,12 +47,12 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		
 	req.Header.Set("Content-Type", "application/json")
 	
-	if callback != ""  && msisdn != "" {
+	if callback != ""  && msisdn != "" && provider!="" {
 		
 		jsonstrtrue := jsonresponse.Response{"success": true, "msisdn": msisdn}
 		fmt.Fprint(resp, callback+"("+jsonstrtrue.String()+");")
 		
-		record := []string{id,msisdn,site,themes,resource}
+		record := []string{id,msisdn,site,themes,resource,provider}
 		memdb.InsertHit(*golog,c,record)
 		
 	} else {

@@ -1,20 +1,47 @@
 package checkcolexist
 
-import ()
+import (
+	"encoding/json"
+	"github.com/HouzuoGuo/tiedot/db"
+//	"github.com/mitchellh/mapstructure"
+//	"domains"
+//	"fmt"
+)
 
-func ChecExist(collections []string, msisdn string) bool {
+func ChecExist(col *db.Col, phonenum string) uint64 {
 
-	var exist bool = false
+	//	var exist bool = false
+	var docID uint64
+//	var exist  bool = false
+	
+	var query interface{}
+	var readBack interface{}
+	queryStr := `{"eq": "` + phonenum + `","in": ["ClPhonenum"]}`
 
-	for _, msisdnloop := range collections {
+	json.Unmarshal([]byte(queryStr), &query)
+	queryResult := make(map[uint64]struct{})
+	if err := db.EvalQuery(query, col, &queryResult); err != nil {
+		panic(err)
+	}
 
-		if msisdnloop == msisdn {
-			exist = true
+//	var mobclientobj domains.MobClient
+	for id := range queryResult {
+		col.Read(id, &readBack)
 
-		}
+		docID = id
+//		mobclientval := readBack.(map[string]interface{})
+//		//
+//		err := mapstructure.Decode(mobclientval, &mobclientobj)
+//		if err != nil {
+//			panic(err)
+//		} else {
+//			exist = true
+//			
+//		}
+	
 
 	}
 
-	return exist
+	return docID
 
 }

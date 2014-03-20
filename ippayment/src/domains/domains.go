@@ -2,28 +2,33 @@ package domains
 
 import ()
 
-type Collection struct {
-	ColPhonenum string
-	ColCreated  int64
-	ColUpdated  int64
-	ColThemes   string
-	ColResource string
-	ColHits     int
+type MobClient struct {
+	ClPhonenum string
+	ClCreated  int64
+	ClUpdated  int64
+	ClThemes   string
+	ClResource string
+	ClProvider string
+	ClBlock    int
+	ClHits       []Hit
+	ClSmsOut  []SmsOut
+	//	ColHits     int
 }
 
-type Hits struct {
+type Hit struct {
 	Created  int64
 	Id       string
 	Msisdn   string
 	Site     string
 	Themes   string
 	Resource string
+	Provider string
 }
-
 
 type SmsOut struct {
 	SmsCreated int64
-	Msisdn string
-	From string
-	Text string
+	Msisdn     string
+	From       string
+	Text       string
+	Provider	string
 }

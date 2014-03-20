@@ -36,6 +36,7 @@ func main() {
 	var collection []string
 
 	tdDB, err := db.OpenDB(dir)
+	defer tdDB.Close()
 	if err != nil {
 		panic(err)
 	}
@@ -51,8 +52,7 @@ func main() {
 	}
 	
 	elaborateallhits.ElabAllHits(*golog,c,*tdDB,collection)
+	tdDB.Flush()
+//	tdDB.Close()
 	
-	
-	
-
 }

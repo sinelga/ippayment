@@ -3,9 +3,10 @@ package elaborateallhits
 import (
 	//"log"
 	"checkcolexist"
-	"checkindex"
+	//	"checkindex"
 	"domains"
 	"encoding/json"
+	"fmt"
 	"github.com/HouzuoGuo/tiedot/db"
 	"github.com/garyburd/redigo/redis"
 	"github.com/mitchellh/mapstructure"
@@ -24,11 +25,13 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 
 		nowunix := time.Now().Unix()
 
+		col := tdDB.Use("mobclients")
+
 		if quan_hits > 0 {
 
 			for i := 0; i < quan_hits; i++ {
 
-				var hit domains.Hits
+				var hit domains.Hit
 
 				bhit, _ := redis.Bytes(c.Do("RPOP", "hits"))
 
@@ -39,124 +42,101 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 
 				}
 
-				if !checkcolexist.ChecExist(collections, hit.Msisdn) {
+				docID := checkcolexist.ChecExist(col, hit.Msisdn)
+				if docID == 0 {
 
 					println("create ", hit.Msisdn)
-					if err := tdDB.Create(hit.Msisdn, 2); err != nil {
 
-						golog.Crit(err.Error())
+					var hitsarr []domains.Hit
+					var smsoutarr []domains.SmsOut
+
+					hitsarr = append(hitsarr, hit)
+
+					if hit.Resource == "mobilephone" {
+
+						smsout := domains.SmsOut{
+							SmsCreated: nowunix,
+							Msisdn:     hit.Msisdn,
+							From:       "070095943",
+							Text:       "Soita! Miia. puh. 070095943",
+							Provider:	hit.Provider,
+						}
+						pushsmsout.PushOut(golog, c, smsout)
+						smsoutarr = append(smsoutarr, smsout)
+
+						col.Insert(map[string]interface{}{
+							"ClPhonenum": hit.Msisdn,
+							"ClCreated":  hit.Created,
+							"ClUpdated":  hit.Created,
+							"ClThemes":   hit.Themes,
+							"ClResource": hit.Resource,
+							"ClProvider": hit.Provider,
+							"ClBlock":    0,
+							"ClHits":     hitsarr,
+							"ClSmsOut":   smsoutarr,
+						})
+
 					} else {
 
-						collections = append(collections, hit.Msisdn)
-
-						checkindex.CheckIndx(golog, tdDB, hit)
-
-						msisdn := tdDB.Use(hit.Msisdn)
-						//						if err := msisdn.Index([]string{"Created"}); err != nil {
-						//							panic(err)
-						//						}
-						//						if err := msisdn.Index([]string{"Id"}); err != nil {
-						//							panic(err)
-						//						}
-						//						if err := msisdn.Index([]string{"Site"}); err != nil {
-						//							panic(err)
-						//						}
-						//						if err := msisdn.Index([]string{"Themes"}); err != nil {
-						//							panic(err)
-						//						}
-						//						if err := msisdn.Index([]string{"Resource"}); err != nil {
-						//							panic(err)
-						//						}
-						//						if err := msisdn.Index([]string{"ColCreated"}); err != nil {
-						//							panic(err)
-						//						}
-
-						msisdn.Insert(map[string]interface{}{
-							"ColCreated":  hit.Created,
-							"ColUpdated":  hit.Created,
-							"ColThemes":   hit.Themes,
-							"ColResource": hit.Resource,
-							"ColHits":     0,
+						col.Insert(map[string]interface{}{
+							"ClPhonenum": hit.Msisdn,
+							"ClCreated":  hit.Created,
+							"ClUpdated":  hit.Created,
+							"ClThemes":   hit.Themes,
+							"ClResource": hit.Resource,
+							"ClProvider": hit.Provider,
+							"ClBlock":    0,
+							"ClHits":     hitsarr,
 						})
-
-						msisdn.Insert(map[string]interface{}{
-							"Created":  hit.Created,
-							"Id":       hit.Id,
-							"Site":     hit.Site,
-							"Themes":   hit.Themes,
-							"Resource": hit.Resource,
-						})
-
-						if hit.Resource == "mobilephone" {
-
-							smsout := domains.SmsOut{
-								SmsCreated: nowunix,
-								Msisdn:     hit.Msisdn,
-								From:       "070095943",
-								Text:       "",
-							}
-							pushsmsout.PushOut(golog, c, smsout)
-
-							msisdn.Insert(map[string]interface{}{
-								"SmsCreated": smsout.SmsCreated,
-								"Msisdn":     smsout.Msisdn,
-								"From":       smsout.From,
-								"Text":       smsout.Text,
-							})
-
-						}
 
 					}
 
 				} else {
 
-					println("Update ", hit.Msisdn, hit.Created)
+					println("Update ", hit.Msisdn)
 
-					msisdn := tdDB.Use(hit.Msisdn)
-					_, err := msisdn.Insert(map[string]interface{}{
-						"Created":  hit.Created,
-						"Id":       hit.Id,
-						"Site":     hit.Site,
-						"Themes":   hit.Themes,
-						"Resource": hit.Resource,
-					})
+					var readBack interface{}
+
+					col.Read(docID, &readBack)
+
+					mobclientval := readBack.(map[string]interface{})
+					var mobclientobj domains.MobClient
+					//
+					err := mapstructure.Decode(mobclientval, &mobclientobj)
 					if err != nil {
 						panic(err)
 					}
 
-					var query interface{}
-					var readBack interface{}
-					queryStr := `{"has": ["ColCreated"],"limit":1000}`
+					fmt.Println("DECODE 2", mobclientobj.ClHits)
 
-					json.Unmarshal([]byte(queryStr), &query)
-					queryResult := make(map[uint64]struct{})
-					if err := db.EvalQuery(query, msisdn, &queryResult); err != nil {
+					mobclientobj.ClHits = append(mobclientobj.ClHits, hit)
 
-						golog.Crit(err.Error())
-						//			tdDB.Drop(name)
+					if hit.Resource == "mobilephone" {
 
-					}
-
-					for id := range queryResult {
-						var collection domains.Collection
-						msisdn.Read(id, &readBack)
-						vals := readBack.(map[string]interface{})
-						err := mapstructure.Decode(vals, &collection)
-						if err != nil {
-							panic(err)
-						}
-						println("update2 ", collection.ColCreated)
-
-						err = msisdn.Update(id, map[string]interface{}{
-							"ColCreated":  collection.ColCreated,
-							"ColUpdated":  nowunix,
-							"ColThemes":   collection.ColThemes,
-							"ColResource": collection.ColResource,
-							"ColHits":     collection.ColHits + 1,
+						col.Update(docID, map[string]interface{}{
+							"ClPhonenum": mobclientobj.ClPhonenum,
+							"ClCreated":  mobclientobj.ClCreated,
+							"ClUpdated":  nowunix,
+							"ClThemes":   mobclientobj.ClThemes,
+							"ClResource": mobclientobj.ClResource,
+							"ClProvider": mobclientobj.ClProvider,
+							"ClBlock":    mobclientobj.ClBlock,
+							"ClHits":     mobclientobj.ClHits,
+							"ClSmsOut":   mobclientobj.ClSmsOut,
 						})
-						if err != nil {
-							panic(err)
-						}
+
+					} else {
+
+						col.Update(docID, map[string]interface{}{
+							"ClPhonenum": mobclientobj.ClPhonenum,
+							"ClCreated":  mobclientobj.ClCreated,
+							"ClUpdated":  nowunix,
+							"ClThemes":   mobclientobj.ClThemes,
+							"ClResource": mobclientobj.ClResource,
+							"ClProvider": mobclientobj.ClProvider,
+							"ClBlock":    mobclientobj.ClBlock,
+							"ClHits":     mobclientobj.ClHits,
+						})
 
 					}
 
@@ -169,5 +149,3 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 	}
 
 }
-
-
