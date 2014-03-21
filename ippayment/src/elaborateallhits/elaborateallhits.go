@@ -101,7 +101,7 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 
 					mobclientval := readBack.(map[string]interface{})
 					var mobclientobj domains.MobClient
-					//
+
 					err := mapstructure.Decode(mobclientval, &mobclientobj)
 					if err != nil {
 						panic(err)
