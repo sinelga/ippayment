@@ -9,6 +9,7 @@ GOBIN=./bin GOPATH=$(pwd) go install src/showcollection.go
 GOBIN=./bin GOPATH=$(pwd) go install src/start.go
 GOBIN=./bin GOPATH=$(pwd) go install src/logconverter.go
 GOBIN=./bin GOPATH=$(pwd) go install src/sendsms.go
+GOBIN=./bin GOPATH=$(pwd) go install src/tstip.go
 
 
 
