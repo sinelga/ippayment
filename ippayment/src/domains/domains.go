@@ -1,6 +1,8 @@
 package domains
 
-import ()
+import (
+"net"
+)
 
 type MobClient struct {
 	ClPhonenum string
@@ -32,3 +34,18 @@ type SmsOut struct {
 	Text       string
 	Provider	string
 }
+
+type ProviderSubnet struct {
+
+	IpNet net.IPNet
+	Provider string
+
+}
+
+type Provider struct {
+
+	Provider string
+	UserAgent string
+
+}
+

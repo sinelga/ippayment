@@ -8,6 +8,7 @@ GOBIN=./bin GOPATH=$(pwd) go install src/allcollection.go
 GOBIN=./bin GOPATH=$(pwd) go install src/showcollection.go
 GOBIN=./bin GOPATH=$(pwd) go install src/start.go
 GOBIN=./bin GOPATH=$(pwd) go install src/logconverter.go
+GOBIN=./bin GOPATH=$(pwd) go install src/sendsms.go
 
 
 
@@ -20,3 +21,9 @@ curl -G -H "X-UP-CALLING-LINE-ID: 358451202801" -d "id=111111122" -d "site=test.
 echo "SET MONIT-TEST value\r\n" | socat - UNIX-CONNECT:/var/run/redis/redis.sock
 
 echo "EXISTS MONIT-TEST" | socat - UNIX-CONNECT:/var/run/redis/redis.sock
+
+
+for i in `seq 1 10`; do sleep 300; bin/hitshandler; bin/sendsms; done
+
+
+
