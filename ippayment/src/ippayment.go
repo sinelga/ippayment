@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/http/fcgi"
 	"sync"
+	"strings"
 )
 
 var startOnce sync.Once
@@ -40,11 +41,11 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		golog.Crit(err.Error())
 
 	}
-
-	ipstr := req.RemoteAddr
-	golog.Info("ip :"+ipstr)
 	
-	ipo := net.ParseIP(ipstr)
+	ipstr := strings.Split(req.RemoteAddr,":")
+	golog.Info("ip :"+ipstr[0])
+	
+	ipo := net.ParseIP(ipstr[0])
 	
 	for _,providersubnet := range providersubnetarr {
 	

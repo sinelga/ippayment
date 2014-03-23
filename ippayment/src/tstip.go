@@ -7,6 +7,7 @@ import (
     "log/syslog"
     "loadsubnets"
     "checkipnet"
+    "strings"
     
     
 )
@@ -25,7 +26,10 @@ func main() {
     if *ipflag == ""  {
         fmt.Println("try -h")
     } else {
-    
+    	
+    	ip := *ipflag
+    	ipstr :=strings.Split(ip,":")
+    	
  		fieldsarr := loadsubnets.Load(*golog,"allsubnet.csv")
  		
  		for _,fields := range fieldsarr {
@@ -35,7 +39,7 @@ func main() {
  		
  		}
  		
- 		checkipnet.Check(*ipflag,fieldsarr)
+ 		checkipnet.Check(ipstr[0],fieldsarr)
  		
  		
  		
