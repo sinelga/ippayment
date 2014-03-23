@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"jsonresponse"
-	"loadsubnets"
+//	"loadsubnets"
 	"log"
 	"log/syslog"
 	"memdb"
@@ -12,12 +12,12 @@ import (
 	"net/http"
 	"net/http/fcgi"
 	"sync"
-	"domains"
+//	"domains"
 )
 
 var startOnce sync.Once
 var ip string
-var providersubnetarr []domains.ProviderSubnet
+//var providersubnetarr []domains.ProviderSubnet
 
 type FastCGIServer struct{}
 
@@ -44,19 +44,17 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	ipstr := req.RemoteAddr
 	golog.Info("ip :"+ipstr)
 	
-	ipo := net.ParseIP(ipstr)
-	
-	for _,providersubnet := range providersubnetarr {
-	
-		if providersubnet.IpNet.Contains(ipo) {
-		
-			golog.Info("provider :"+providersubnet.Provider)
-		
-		}
-	
-	}
-	
-	
+//	ipo := net.ParseIP(ipstr)
+//	
+//	for _,providersubnet := range providersubnetarr {
+//	
+//		if providersubnet.IpNet.Contains(ipo) {
+//		
+//			golog.Info("provider :"+providersubnet.Provider)
+//		
+//		}
+//	
+//	}
 
 	msisdn := req.Header.Get("X-UP-CALLING-LINE-ID")
 	golog.Info("msisdn " + msisdn)
@@ -102,22 +100,22 @@ func main() {
 func startones(golog syslog.Writer) {
 
 	golog.Info("startones: Start")
-	fieldsarr := loadsubnets.Load(golog, "allsubnet.csv")
-
-	for _, field := range fieldsarr {
-
-		_, ipnet, _ := net.ParseCIDR(field[0])
-		
-		providersubnet := domains.ProviderSubnet {
-		
-			IpNet: *ipnet,
-			Provider: field[1], 
-		
-		}
-		
-		providersubnetarr = append(providersubnetarr,providersubnet)
-								
-	
-	}
+//	fieldsarr := loadsubnets.Load(golog, "allsubnet.csv")
+//
+//	for _, field := range fieldsarr {
+//
+//		_, ipnet, _ := net.ParseCIDR(field[0])
+//		
+//		providersubnet := domains.ProviderSubnet {
+//		
+//			IpNet: *ipnet,
+//			Provider: field[1], 
+//		
+//		}
+//		
+//		providersubnetarr = append(providersubnetarr,providersubnet)
+//								
+//	
+//	}
 
 }
