@@ -35,6 +35,8 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		startones(*golog)
 	})
 
+	provider := "NotMobile"
+	
 	c, err := redis.Dial("tcp", ":6379")
 	if err != nil {
 
@@ -47,16 +49,19 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	
 	ipo := net.ParseIP(ipstr[0])
 	
+	
+	
 	for _,providersubnet := range providersubnetarr {
 	
 		if providersubnet.IpNet.Contains(ipo) {
 		
-			golog.Info("provider :"+providersubnet.Provider)
-		
+			golog.Info("provider: "+providersubnet.Provider)
+			provider = providersubnet.Provider
+					
 		}
 	
 	}
-
+	
 	msisdn := req.Header.Get("X-UP-CALLING-LINE-ID")
 	golog.Info("msisdn " + msisdn)
 
@@ -65,25 +70,35 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	id := req.URL.Query().Get("id")
 	resource := req.URL.Query().Get("resource")
 	themes := req.URL.Query().Get("themes")
-	provider := req.URL.Query().Get("provider")
+//	provider := req.URL.Query().Get("provider")
 
-	golog.Info("id: " + id + " site: " + site + " resource: " + resource + " themes: " + themes)
-
-	req.Header.Set("Content-Type", "application/json")
-
-	if callback != "" && msisdn != "" && provider != "" {
-
-		jsonstrtrue := jsonresponse.Response{"success": true, "msisdn": msisdn}
-		fmt.Fprint(resp, callback+"("+jsonstrtrue.String()+");")
-
+	golog.Info("id: " + id + " site: " + site + " resource: " + resource + " themes: " + themes+" provider: "+provider )
+	
+	if provider == "MobileSonera" && site != "" && id != "" && msisdn != "" &&  themes != "" && resource != "" {
+	
+		golog.Info("Ok insert record in redis for Sonera")
 		record := []string{id, msisdn, site, themes, resource, provider}
 		memdb.InsertHit(*golog, c, record)
+	
+	
+	}
+	
+	req.Header.Set("Content-Type", "application/json")
 
-	} else {
-		jsonstrfalse := jsonresponse.Response{"success": false, "msisdn": ""}
-		fmt.Fprint(resp, callback+"("+jsonstrfalse.String()+");")
+	if callback != "" {
+
+		jsonstrtrue := jsonresponse.Response{"success": true, "msisdn": msisdn,"provider": provider}
+		fmt.Fprint(resp, callback+"("+jsonstrtrue.String()+");")
 
 	}
+	
+	
+	 
+//	else {
+//		jsonstrfalse := jsonresponse.Response{"success": false, "msisdn": ""}
+//		fmt.Fprint(resp, callback+"("+jsonstrfalse.String()+");")
+//
+//	}
 
 }
 
