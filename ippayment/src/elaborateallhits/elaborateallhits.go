@@ -6,16 +6,17 @@ import (
 	//	"checkindex"
 	"domains"
 	"encoding/json"
-	"fmt"
+//	"fmt"
 	"github.com/HouzuoGuo/tiedot/db"
 	"github.com/garyburd/redigo/redis"
 	"github.com/mitchellh/mapstructure"
 	"log/syslog"
 	"pushsmsout"
 	"time"
+	"elabsmsout"
 )
 
-func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []string) {
+func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB) {
 
 	if quan_hits, err := redis.Int(c.Do("LLEN", "hits")); err != nil {
 
@@ -107,11 +108,15 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB, collections []st
 						panic(err)
 					}
 
-					fmt.Println("DECODE 2", mobclientobj.ClHits)
+//					fmt.Println("DECODE 2", mobclientobj.ClHits)
 
 					mobclientobj.ClHits = append(mobclientobj.ClHits, hit)
 
 					if hit.Resource == "mobilephone" {
+					
+								
+						elabsmsout.Elab(golog,mobclientobj.ClSmsOut)
+						
 
 						col.Update(docID, map[string]interface{}{
 							"ClPhonenum": mobclientobj.ClPhonenum,

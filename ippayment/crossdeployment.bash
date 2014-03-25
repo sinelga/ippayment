@@ -2,6 +2,7 @@
 
 rm pkg/linux_386/*.a
 rm bin/*
+git pull
 
 GOBIN=./bin GOPATH=$(pwd) go install src/ippayment.go
 GOBIN=./bin GOPATH=$(pwd) go install src/hitshandler.go

@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"github.com/HouzuoGuo/tiedot/db"
 	"github.com/mitchellh/mapstructure"
-	//	"time"
+	"time"
 	//	"strconv"
 	"domains"
-	//	"sort"
+	"sort"
 )
 
 var phonenumflag *string = flag.String("phonenum", "", "phonenume format 358...")
@@ -18,7 +18,13 @@ type ByAge []domains.Hit
 
 func (a ByAge) Len() int           { return len(a) }
 func (a ByAge) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByAge) Less(i, j int) bool { return a[i].Created > a[j].Created }
+func (a ByAge) Less(i, j int) bool { return a[i].Created < a[j].Created }
+
+type ByAgeSms []domains.SmsOut
+
+func (a ByAgeSms) Len() int           { return len(a) }
+func (a ByAgeSms) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByAgeSms) Less(i, j int) bool { return a[i].SmsCreated < a[j].SmsCreated }
 
 func main() {
 	flag.Parse() // Scan the arguments list
@@ -37,10 +43,6 @@ func main() {
 
 		mobclient := tdDB.Use("mobclients")
 
-		for path := range mobclient.SecIndexes {
-			fmt.Printf("I have an index on path %s\n", path)
-		}
-
 		var query interface{}
 		var readBack interface{}
 		queryStr := `{"eq": "` + phonenum + `","in": ["ClPhonenum"]}`
@@ -53,7 +55,6 @@ func main() {
 		var mobclientobj domains.MobClient
 		for id := range queryResult {
 			mobclient.Read(id, &readBack)
-			fmt.Println(readBack)
 
 			mobclientval := readBack.(map[string]interface{})
 
@@ -61,10 +62,24 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println("Hits ", mobclientobj.ClHits)
-			if mobclientobj.ClResource == "mobilephone" {
-				fmt.Println("Sms ", mobclientobj.ClSmsOut)
 
+			sort.Sort(ByAge(mobclientobj.ClHits))
+			fmt.Println("Hits ")
+			for _, hit := range mobclientobj.ClHits {
+
+				fmt.Println(time.Unix(hit.Created, 0), hit.Site, hit.Resource)
+
+			}
+
+			if mobclientobj.ClResource == "mobilephone" {
+//				fmt.Println("Sms ", mobclientobj.ClSmsOut)
+				fmt.Println("SmsOut")
+				sort.Sort(ByAgeSms(mobclientobj.ClSmsOut))
+				for _, smsout := range mobclientobj.ClSmsOut {
+					fmt.Println(time.Unix(smsout.SmsCreated, 0),smsout.From,smsout.Text)
+				
+				}
+				
 			}
 
 		}

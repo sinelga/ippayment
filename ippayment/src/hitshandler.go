@@ -33,16 +33,10 @@ func main() {
 		log.Fatal("error writing syslog!!")
 	}
 	
-	var collection []string
-
 	tdDB, err := db.OpenDB(dir)
 	defer tdDB.Close()
 	if err != nil {
 		panic(err)
-	}
-	for name := range tdDB.StrCol {
-		fmt.Printf("I have a collection called %s\n", name)
-		collection = append(collection,name)		
 	}
 	
 	c, err := redis.Dial("tcp", ":6379")
@@ -51,8 +45,8 @@ func main() {
 		golog.Crit(err.Error())
 	}
 	
-	elaborateallhits.ElabAllHits(*golog,c,*tdDB,collection)
+	elaborateallhits.ElabAllHits(*golog,c,*tdDB)
 	tdDB.Flush()
-//	tdDB.Close()
+
 	
 }
