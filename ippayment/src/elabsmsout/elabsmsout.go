@@ -19,9 +19,9 @@ func Elab(golog syslog.Writer,smsoutarr []domains.SmsOut) {
 
 		}
 	}
-	difftime := (nowunix - lastdate)/60
+	difftime := (nowunix - lastdate)
 	
-	golog.Info("Time sends SMS min? "+strconv.FormatInt(difftime,10))
+	golog.Info("Time sends SMS min? last "+ strconv.FormatInt(lastdate,10)+" diff "+ strconv.FormatInt(difftime,10))
 		
 
 }
