@@ -108,14 +108,12 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB) {
 						panic(err)
 					}
 
-//					fmt.Println("DECODE 2", mobclientobj.ClHits)
-
 					mobclientobj.ClHits = append(mobclientobj.ClHits, hit)
 
 					if hit.Resource == "mobilephone" {
 					
 								
-						elabsmsout.Elab(golog,mobclientobj.ClSmsOut)
+						elabsmsout.Elab(golog,hit.Msisdn,mobclientobj.ClSmsOut)
 						
 
 						col.Update(docID, map[string]interface{}{

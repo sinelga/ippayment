@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func Elab(golog syslog.Writer,smsoutarr []domains.SmsOut) {
+func Elab(golog syslog.Writer,clphonenum string,smsoutarr []domains.SmsOut) {
 	
 	nowunix := time.Now().Unix()
 		
@@ -21,7 +21,7 @@ func Elab(golog syslog.Writer,smsoutarr []domains.SmsOut) {
 	}
 	difftime := (nowunix - lastdate)
 	
-	golog.Info("Time sends SMS min? last "+ strconv.FormatInt(lastdate,10)+" diff "+ strconv.FormatInt(difftime,10))
+	golog.Info("Time sends SMS min? last "+clphonenum +" "+ strconv.FormatInt(lastdate,10)+" diff "+ strconv.FormatInt(difftime,10))
 		
 
 }
