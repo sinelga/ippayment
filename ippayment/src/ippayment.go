@@ -45,7 +45,7 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	ipstr := strings.Split(req.RemoteAddr, ":")
-	golog.Info("ip :" + ipstr[0])
+//	golog.Info("ip :" + ipstr[0])
 
 	ipo := net.ParseIP(ipstr[0])
 
@@ -53,7 +53,7 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 		if providersubnet.IpNet.Contains(ipo) {
 
-			golog.Info("provider: " + providersubnet.Provider)
+//			golog.Info("provider: " + providersubnet.Provider)
 			provider = providersubnet.Provider
 
 		}
@@ -61,7 +61,7 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	msisdn := req.Header.Get("X-UP-CALLING-LINE-ID")
-	golog.Info("msisdn " + msisdn)
+//	golog.Info("msisdn " + msisdn)
 
 	callback := req.URL.Query().Get("callback")
 	site := req.URL.Query().Get("site")
@@ -69,7 +69,7 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	resource := req.URL.Query().Get("resource")
 	themes := req.URL.Query().Get("themes")
 
-	golog.Info("id: " + id + " site: " + site + " resource: " + resource + " themes: " + themes + " provider: " + provider)
+	golog.Info("id: " + id + " site: " + site + " resource: " + resource + " themes: " + themes + " provider: " + provider+" msisdn: " + msisdn)
 
 	if provider == "MobileSonera" && site != "" && id != "" && msisdn != "" && themes != "" && resource != "" {
 
