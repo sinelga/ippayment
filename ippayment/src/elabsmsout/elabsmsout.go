@@ -2,12 +2,14 @@ package elabsmsout
 
 import (
 	"domains"
+	"github.com/garyburd/redigo/redis"
 	"log/syslog"
+	"pushsmsout"
 	"strconv"
 	"time"
 )
 
-func Elab(golog syslog.Writer, clphonenum string, smsoutarr []domains.SmsOut) {
+func Elab(golog syslog.Writer, c redis.Conn, clphonenum string, provider string, smsoutarr []domains.SmsOut) []domains.SmsOut {
 
 	nowunix := time.Now().Unix()
 
@@ -28,8 +30,24 @@ func Elab(golog syslog.Writer, clphonenum string, smsoutarr []domains.SmsOut) {
 		}
 		difftime := (nowunix - lastdate)
 
-		golog.Info("Time sends SMS min? last " + clphonenum + " " + strconv.FormatInt(lastdate, 10) + " diff " + strconv.FormatInt(difftime, 10))
+		if difftime > 300 {
+		
+			golog.Info("Time sends Second SMS  " + clphonenum + " " + strconv.FormatInt(lastdate, 10) + " diff " + strconv.FormatInt(difftime, 10))
+
+			smsout := domains.SmsOut{
+				SmsCreated: nowunix,
+				Msisdn:     clphonenum,
+				From:       "070095943",
+				Text:       "On aika tutustua! Miia soita.",
+				Provider:   provider,
+			}
+			pushsmsout.PushOut(golog, c, smsout)
+			smsoutarr = append(smsoutarr, smsout)
+
+		}
 
 	}
+
+	return smsoutarr
 
 }
