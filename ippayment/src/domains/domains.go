@@ -1,7 +1,7 @@
 package domains
 
 import (
-"net"
+	"net"
 )
 
 type MobClient struct {
@@ -12,8 +12,8 @@ type MobClient struct {
 	ClResource string
 	ClProvider string
 	ClBlock    int
-	ClHits       []Hit
-	ClSmsOut  []SmsOut
+	ClHits     []Hit
+	ClSmsOut   []SmsOut
 	//	ColHits     int
 }
 
@@ -32,20 +32,16 @@ type SmsOut struct {
 	Msisdn     string
 	From       string
 	Text       string
-	Provider	string
+	Provider   string
+	Site       string
 }
 
 type ProviderSubnet struct {
-
-	IpNet net.IPNet
+	IpNet    net.IPNet
 	Provider string
-
 }
 
 type Provider struct {
-
-	Provider string
+	Provider  string
 	UserAgent string
-
 }
-

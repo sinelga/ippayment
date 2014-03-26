@@ -61,6 +61,7 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB) {
 							From:       "070095943",
 							Text:       "Soita! Miia. puh. 070095943",
 							Provider:	hit.Provider,
+							Site:	hit.Site,
 						}
 						pushsmsout.PushOut(golog, c, smsout)
 						smsoutarr = append(smsoutarr, smsout)
@@ -111,11 +112,9 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB) {
 					mobclientobj.ClHits = append(mobclientobj.ClHits, hit)
 
 					if hit.Resource == "mobilephone" {
-					
-								
+													
 						smsoutarrupdated := elabsmsout.Elab(golog,c,hit.Msisdn,hit.Provider,mobclientobj.ClSmsOut)
 						
-
 						col.Update(docID, map[string]interface{}{
 							"ClPhonenum": mobclientobj.ClPhonenum,
 							"ClCreated":  mobclientobj.ClCreated,
