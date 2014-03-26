@@ -29,10 +29,11 @@ func Elab(golog syslog.Writer, c redis.Conn, clphonenum string, provider string,
 			}
 		}
 		difftime := (nowunix - lastdate)
-
-		if difftime > 300 {
 		
-			golog.Info("Time sends Second SMS  " + clphonenum + " " + strconv.FormatInt(lastdate, 10) + " diff " + strconv.FormatInt(difftime, 10))
+		golog.Info("Time sends Second SMS must be more 300 " + clphonenum + " " + strconv.FormatInt(lastdate, 10) + " diff " + strconv.FormatInt(difftime, 10))
+		
+
+		if difftime > 300 {			
 
 			smsout := domains.SmsOut{
 				SmsCreated: nowunix,
