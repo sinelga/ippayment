@@ -30,7 +30,9 @@ func Elab(golog syslog.Writer, c redis.Conn, clphonenum string, provider string,
 		}
 		difftime := (nowunix - lastdate)
 
-		golog.Info("Time sends Second SMS must be more 300 " + clphonenum + " " + strconv.FormatInt(lastdate, 10) + " diff " + strconv.FormatInt(difftime, 10))
+		smsquant := len(smsoutarr)
+
+		golog.Info("Time sends Second SMS must be more 300 " + clphonenum + " " + strconv.FormatInt(lastdate, 10) + " diff " + strconv.FormatInt(difftime, 10) + " smsquant " + strconv.Itoa(smsquant))
 
 		if difftime > 300 {
 
@@ -38,9 +40,8 @@ func Elab(golog syslog.Writer, c redis.Conn, clphonenum string, provider string,
 				SmsCreated: nowunix,
 				Msisdn:     clphonenum,
 				From:       "070095943",
-				Text:       "On aika tutustua! Miia soita. "+site,
+				Text:       "On aika tutustua! Miia soita. " + site,
 				Provider:   provider,
-				
 			}
 			pushsmsout.PushOut(golog, c, smsout)
 			smsoutarr = append(smsoutarr, smsout)
