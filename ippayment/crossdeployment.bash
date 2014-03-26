@@ -7,7 +7,8 @@ rm bin/allcollection
 rm bin/showcollection
 rm bin/start
 rm bin/logconverter
-rm bin/tstip.
+rm bin/sendsms
+rm bin/tstip
 
 git pull
 
