@@ -1,19 +1,16 @@
 package elaborateallhits
 
 import (
-	//"log"
 	"checkcolexist"
-	//	"checkindex"
 	"domains"
+	"elabsmsout"
 	"encoding/json"
-//	"fmt"
 	"github.com/HouzuoGuo/tiedot/db"
 	"github.com/garyburd/redigo/redis"
 	"github.com/mitchellh/mapstructure"
 	"log/syslog"
 	"pushsmsout"
 	"time"
-	"elabsmsout"
 )
 
 func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB) {
@@ -46,8 +43,6 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB) {
 				docID := checkcolexist.ChecExist(col, hit.Msisdn)
 				if docID == 0 {
 
-					println("create ", hit.Msisdn)
-
 					var hitsarr []domains.Hit
 					var smsoutarr []domains.SmsOut
 
@@ -59,9 +54,8 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB) {
 							SmsCreated: nowunix,
 							Msisdn:     hit.Msisdn,
 							From:       "070095943",
-							Text:       "Soita! Miia. puh. 070095943",
-							Provider:	hit.Provider,
-							
+							Text:       "Soita nyt! Miia. " + hit.Site,
+							Provider:   hit.Provider,
 						}
 						pushsmsout.PushOut(golog, c, smsout)
 						smsoutarr = append(smsoutarr, smsout)
@@ -95,8 +89,6 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB) {
 
 				} else {
 
-					println("Update ", hit.Msisdn)
-
 					var readBack interface{}
 
 					col.Read(docID, &readBack)
@@ -112,9 +104,9 @@ func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB) {
 					mobclientobj.ClHits = append(mobclientobj.ClHits, hit)
 
 					if hit.Resource == "mobilephone" {
-													
-						smsoutarrupdated := elabsmsout.Elab(golog,c,hit.Msisdn,hit.Provider,hit.Site,mobclientobj.ClSmsOut)
-						
+
+						smsoutarrupdated := elabsmsout.Elab(golog, c, hit.Msisdn, hit.Provider, hit.Site, mobclientobj.ClSmsOut)
+
 						col.Update(docID, map[string]interface{}{
 							"ClPhonenum": mobclientobj.ClPhonenum,
 							"ClCreated":  mobclientobj.ClCreated,
