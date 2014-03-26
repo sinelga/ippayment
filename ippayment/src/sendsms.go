@@ -6,10 +6,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
+	"io/ioutil"
 	"log"
 	"log/syslog"
-	"io/ioutil"
 	"net/http"
+	"net/url"
 )
 
 const APP_VERSION = "0.1"
@@ -53,6 +54,7 @@ func main() {
 			bsmsout, _ := redis.Bytes(c.Do("LPOP", "smsout"))
 
 			err := json.Unmarshal(bsmsout, &smsout)
+			var urlstr string
 			if err != nil {
 
 				golog.Crit(err.Error())
@@ -60,7 +62,27 @@ func main() {
 			} else {
 
 				fmt.Println(smsout.Msisdn)
-				resp, err := http.Get("http://79.125.27.200:9000/?msisdn=" + smsout.Msisdn)
+
+				if Url, err := url.Parse("http://79.125.27.200:9000"); err != nil {
+
+					panic("boom")
+				} else {
+					Url.Path += "/"
+					parameters := url.Values{}
+					parameters.Add("msisdn", smsout.Msisdn)
+					parameters.Add("text", smsout.Text)
+					parameters.Add("from", smsout.From)
+//					parameters.Add("site", smsout.)
+					parameters.Add("provider", smsout.Provider)
+
+					Url.RawQuery = parameters.Encode()
+					urlstr = Url.String()
+
+				}
+				fmt.Println(urlstr)
+
+//				resp, err := http.Get("http://79.125.27.200:9000/?msisdn=" + smsout.Msisdn)
+				resp, err := http.Get(urlstr)
 				defer resp.Body.Close()
 				if err != nil {
 
@@ -70,10 +92,10 @@ func main() {
 					if err != nil {
 						golog.Crit(err.Error())
 					} else {
-					
+
 						golog.Info(string(body))
-					
-					}					
+
+					}
 
 				}
 
