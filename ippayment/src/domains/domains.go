@@ -33,7 +33,7 @@ type SmsOut struct {
 	From       string
 	Text       string
 	Provider   string
-	Site       string
+	
 }
 
 type ProviderSubnet struct {
