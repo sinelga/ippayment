@@ -13,10 +13,7 @@ import (
 	"net/url"
 )
 
-const APP_VERSION = "0.1"
 
-// The flag package provides a default help printer via -h switch
-//var versionFlag *bool = flag.Bool("v", false, "Print the version number.")
 var quantFlag = flag.Int("quant", 1, "quant can be > 1")
 
 func main() {
@@ -72,7 +69,6 @@ func main() {
 					parameters.Add("msisdn", smsout.Msisdn)
 					parameters.Add("text", smsout.Text)
 					parameters.Add("from", smsout.From)
-//					parameters.Add("site", smsout.)
 					parameters.Add("provider", smsout.Provider)
 
 					Url.RawQuery = parameters.Encode()
@@ -80,8 +76,6 @@ func main() {
 
 				}
 				fmt.Println(urlstr)
-
-//				resp, err := http.Get("http://79.125.27.200:9000/?msisdn=" + smsout.Msisdn)
 				resp, err := http.Get(urlstr)
 				defer resp.Body.Close()
 				if err != nil {

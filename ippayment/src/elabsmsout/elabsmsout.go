@@ -41,7 +41,7 @@ func Elab(golog syslog.Writer, c redis.Conn, clphonenum string, provider string,
 				SmsCreated: nowunix,
 				Msisdn:     clphonenum,
 				From:       "070095943",
-				Text:       "On aika tutustua! Miia soita. " + site,
+				Text:       "On aika tutustua! Soita nyt. Miia " + site,
 				Provider:   provider,
 			}
 			pushsmsout.PushOut(golog, c, smsout)
