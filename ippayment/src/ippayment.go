@@ -53,7 +53,6 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 		if providersubnet.IpNet.Contains(ipo) {
 
-//			golog.Info("provider: " + providersubnet.Provider)
 			provider = providersubnet.Provider
 
 		}
