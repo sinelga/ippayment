@@ -78,7 +78,7 @@ func ElaborateHit(golog syslog.Writer, hit domains.Hit) domains.MobClientHtml {
 				smsouthtml := domains.SmsOutHtml{
 					Created: tstr,
 					From:    "070095943",
-					Text:    "Nyt on aika tutustua. Miia, soita! " + hit.Site,
+					Text:    "Nyt on aika tutustua. Miia, soita! http://" + hit.Site,
 				}
 				mobclienthtml.ClSmsOut = append(mobclienthtml.ClSmsOut, smsouthtml)
 
