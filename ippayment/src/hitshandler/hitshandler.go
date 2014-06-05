@@ -84,7 +84,7 @@ func ElaborateHit(golog syslog.Writer, hit domains.Hit) domains.MobClientHtml {
 
 			}
 
-			if diffsmsouttime.Minutes() > -170 && !blockbool && (len(mobclienthtml.ClSmsOut) == 2) {
+			if diffsmsouttime.Minutes() > 0 && !blockbool && (len(mobclienthtml.ClSmsOut) == 2) {
 
 				smsout := domains.SmsOut{
 					SmsCreated: nowunix,
@@ -112,7 +112,7 @@ func ElaborateHit(golog syslog.Writer, hit domains.Hit) domains.MobClientHtml {
 		lastpaymentdate := timeconverter.StrToTime(lastpaymentdatestr)
 
 		diffpaymenttime := t.Sub(lastpaymentdate)
-		if diffpaymenttime.Minutes() > -170 && !blockbool {
+		if diffpaymenttime.Minutes() > 43200 && !blockbool {
 
 			mobclienthtml.ClPayments = append(mobclienthtml.ClPayments, makepayment.Pay(golog, hit.Msisdn, hit.Provider, "70", hit.Themes))
 
