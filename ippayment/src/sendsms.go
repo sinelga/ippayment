@@ -13,7 +13,6 @@ import (
 	"net/url"
 )
 
-
 var quantFlag = flag.Int("quant", 1, "quant can be > 1")
 
 func main() {
@@ -27,7 +26,7 @@ func main() {
 
 	flag.Parse() // Scan the arguments list
 
-	quant := *quantFlag
+	//	quant := *quantFlag
 
 	c, err := redis.Dial("tcp", ":6379")
 	if err != nil {
@@ -42,9 +41,11 @@ func main() {
 
 	} else {
 
-		fmt.Println("quant_smsout", quant_smsout)
+		//		fmt.Println("quant_smsout", quant_smsout)
+		//		if quant_smsout > 0 {
 
-		for i := 0; i < quant; i++ {
+		for i := 0; i < quant_smsout; i++ {
+			//			for i :=range quant_smsout {
 
 			var smsout domains.SmsOut
 
@@ -62,7 +63,7 @@ func main() {
 
 				if Url, err := url.Parse("http://79.125.27.200:9000"); err != nil {
 
-					panic("boom")
+					golog.Err("sendsms: " + err.Error())
 				} else {
 					Url.Path += "/"
 					parameters := url.Values{}
@@ -80,11 +81,11 @@ func main() {
 				defer resp.Body.Close()
 				if err != nil {
 
-					golog.Crit(err.Error())
+					golog.Crit("sendsms: " + err.Error())
 				} else {
 					body, err := ioutil.ReadAll(resp.Body)
 					if err != nil {
-						golog.Crit(err.Error())
+						golog.Crit("sendsms: " + err.Error())
 					} else {
 
 						golog.Info(string(body))
@@ -97,6 +98,7 @@ func main() {
 
 		}
 
+		//		}
 	}
 
 }
