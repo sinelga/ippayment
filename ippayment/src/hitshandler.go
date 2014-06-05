@@ -11,9 +11,6 @@ import (
 	"hitshandler"
 	"log"
 	"log/syslog"
-	//	"elaborateallhits"
-	//	"time"
-	//	"math/rand"
 )
 
 const APP_VERSION = "0.1"
@@ -40,8 +37,6 @@ func main() {
 		golog.Crit(err.Error())
 	}
 
-	//	elaborateallhits.ElabAllHits(*golog,c,*tdDB)
-	//	tdDB.Flush()
 
 	if quan_hits, err := redis.Int(c.Do("LLEN", "hits")); err != nil {
 
@@ -64,7 +59,7 @@ func main() {
 
 				} else {
 
-					MobClientHtml := hitshandler.ElaborateHit(*golog, hit)
+					MobClientHtml := hitshandler.ElaborateHit(*golog,c, hit)
 					CreateHtmlGz.CreateFile(*golog, MobClientHtml)
 
 				}

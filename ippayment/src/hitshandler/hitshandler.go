@@ -13,13 +13,13 @@ import (
 	"timeconverter"
 )
 
-func ElaborateHit(golog syslog.Writer, hit domains.Hit) domains.MobClientHtml {
+func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.MobClientHtml {
 
 	nowunix := time.Now().Unix()
-	c, err := redis.Dial("tcp", ":6379")
-	if err != nil {
-		golog.Crit(err.Error())
-	}
+	//	c, err := redis.Dial("tcp", ":6379")
+	//	if err != nil {
+	//		golog.Crit(err.Error())
+	//	}
 
 	htmlfile := string("/home/juno/git/ippayment/ippayment/www/tel/" + hit.Msisdn + ".html.gz")
 	var mobclienthtml domains.MobClientHtml
@@ -30,7 +30,7 @@ func ElaborateHit(golog syslog.Writer, hit domains.Hit) domains.MobClientHtml {
 	var blockbool bool
 	tvisit := time.Unix(hit.Created, 0)
 	tvisitstr := tvisit.Format("2006/01/02 15:04:05")
-//	t := time.Now().Local()
+	//	t := time.Now().Local()
 	t := time.Now()
 	tstr := t.Format("2006/01/02 15:04:05")
 
@@ -106,7 +106,6 @@ func ElaborateHit(golog syslog.Writer, hit domains.Hit) domains.MobClientHtml {
 			}
 
 		}
-
 
 		lastpaymentdatestr := mobclienthtml.ClPayments[len(mobclienthtml.ClPayments)-1].Created
 		lastpaymentdate := timeconverter.StrToTime(lastpaymentdatestr)
