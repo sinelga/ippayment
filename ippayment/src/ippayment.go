@@ -1,9 +1,11 @@
 package main
 
 import (
+	"CreateHtmlGz"
 	"domains"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
+	"htmlhandler"
 	"jsonresponse"
 	"loadsubnets"
 	"log"
@@ -45,7 +47,8 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	ipstr := strings.Split(req.RemoteAddr, ":")
-//	golog.Info("ip :" + ipstr[0])
+
+	golog.Info("req.RequestURI " + req.URL.RequestURI())
 
 	ipo := net.ParseIP(ipstr[0])
 
@@ -60,7 +63,6 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	msisdn := req.Header.Get("X-UP-CALLING-LINE-ID")
-//	golog.Info("msisdn " + msisdn)
 
 	callback := req.URL.Query().Get("callback")
 	site := req.URL.Query().Get("site")
@@ -68,7 +70,7 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	resource := req.URL.Query().Get("resource")
 	themes := req.URL.Query().Get("themes")
 
-	golog.Info("id: " + id + " site: " + site + " resource: " + resource + " themes: " + themes + " provider: " + provider+" msisdn: " + msisdn)
+	golog.Info("id: " + id + " site: " + site + " resource: " + resource + " themes: " + themes + " provider: " + provider + " msisdn: " + msisdn)
 
 	if provider == "MobileSonera" && site != "" && id != "" && msisdn != "" && themes != "" && resource != "" {
 
@@ -84,6 +86,30 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 		jsonstrtrue := jsonresponse.Response{"success": true, "msisdn": msisdn, "provider": provider}
 		fmt.Fprint(resp, callback+"("+jsonstrtrue.String()+");")
+
+	}
+
+	if strings.HasPrefix(req.URL.RequestURI(), "/blocktel") {
+
+		golog.Info("tel: " + req.URL.Query().Get("tel"))
+		tel := req.URL.Query().Get("tel")
+
+		if strings.HasPrefix(tel, "358") {
+			htmlfile := string("/home/juno/git/ippayment/ippayment/www/tel/" + tel + ".html.gz")
+			mobclienthtml := htmlhandler.ParseHtmlGzFile(*golog, htmlfile)
+			mobclienthtml.ClBlock = "Yes"
+
+			CreateHtmlGz.CreateFile(*golog, mobclienthtml)
+		} else {
+
+			golog.Err("!!! Check req "+req.URL.RequestURI())
+		}
+
+	}
+
+	if strings.HasPrefix(req.URL.RequestURI(), "/tel") {
+
+		fmt.Fprint(resp, "Don't exist "+req.URL.RequestURI())
 
 	}
 

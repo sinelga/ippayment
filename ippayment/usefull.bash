@@ -28,3 +28,9 @@ for i in `seq 1 10`; do sleep 300; bin/hitshandler; bin/sendsms; done
 
 
 
+curl -i -d "MSISDN=%2B358451202801&ServiceId=2&Price=100" ippayment.info:8080/MobileCharger?Action=Check
+
+curl -i -d "MSISDN=%2B358451202801&ServiceId=2&Price=100&TransactionId=" ippayment.info:8080/MobileCharger?Action=Charge
+
+
+GOPATH=$GOPATH:/home/juno/git/ippayment/ippayment go test -v

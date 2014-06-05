@@ -1,0 +1,79 @@
+ {{ define "contents" }}
+
+
+<div class="panel panel-default ">
+
+	<div class="panel-heading">
+
+		<div id="tel" style="display: inline;">{{.ClPhonenum}}</div>
+		Block
+		<div id="block" style="display: inline;">{{.ClBlock}}</div>
+		<input type ="button" id = "sb" value="Block?"/>
+
+	</div>
+
+	<table id="payments" class="table-bordered">
+		<caption>Payments</caption>
+		<tr>
+			<th>date</th>
+			<th>&#162;</th>
+			<th>result</th>
+		</tr>
+
+
+		{{range .ClPayments}}
+		<tr>
+			<td>{{.Created}}</td>
+			<td>{{.Amount}}</td>
+			<td>{{.Result}}</td>
+		</tr>
+		{{end}}
+
+	</table>
+
+	<table id="hits" class="table-bordered">
+		<caption>Visits</caption>
+		<tr>
+			<th>date</th>
+			<th>site</th>
+			<th>th.</th>
+			<th>resource</th>
+			<th>prov.</th>
+		</tr>
+
+		{{range .ClHits}}
+		<tr>
+			<td>{{.Createdstr }}</td>
+			<td>{{.Site }}</td>
+			<td>{{.Themes}}</td>
+			<td>{{.Resource}}</td>
+			<td>{{.Provider}}</td>
+		</tr>
+		{{end}}
+
+
+	</table>
+
+	<table id="smsout" class="table-bordered">
+		<caption>SmsOut</caption>
+		<tr>
+			<th>date</th>
+			<th>from</th>
+			<th>text</th>
+		</tr>
+
+		{{range .ClSmsOut}}
+		<tr>
+			<td>{{.Created}}</td>
+			<td>{{.From}}</td>
+			<td>{{.Text}}</td>
+		</tr>
+		{{end}}
+
+	</table>
+
+</div>
+<div id="message_ajax"></div>
+
+
+{{ end }}

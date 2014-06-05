@@ -11,7 +11,15 @@ import (
 	"log/syslog"
 	"pushsmsout"
 	"time"
+	"fmt"
+	
 )
+
+func ElabAllHitsHtmlFile(){
+
+	fmt.Println("lslsls")
+
+}
 
 func ElabAllHits(golog syslog.Writer, c redis.Conn, tdDB db.DB) {
 
