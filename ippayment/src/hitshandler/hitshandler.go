@@ -38,7 +38,7 @@ func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.Mo
 
 	if checkgzfileexist.CheckFile(golog, htmlfile) {
 
-		golog.Info(htmlfile + " Exist")
+		//		golog.Info(htmlfile + " Exist")
 
 		mobclienthtml = htmlhandler.ParseHtmlGzFile(golog, htmlfile)
 
@@ -119,7 +119,7 @@ func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.Mo
 
 	} else {
 
-		golog.Info(htmlfile + " Don't Exist")
+		//		golog.Info(htmlfile + " Don't Exist")
 
 		if hit.Resource == "mobilephone" {
 

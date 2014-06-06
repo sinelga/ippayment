@@ -1,7 +1,6 @@
 package checkgzfileexist
 
 import (
-	"fmt"
 	"log/syslog"
 	"os"
 	"strconv"
@@ -11,8 +10,6 @@ func CheckFile(golog syslog.Writer, htmlfile string) bool {
 
 	retbool := false
 	var i64sizesmall int64 = 100
-
-	fmt.Println("start CheckFile")
 
 	finfo, err := os.Stat(htmlfile)
 	if err != nil {
@@ -32,7 +29,7 @@ func CheckFile(golog syslog.Writer, htmlfile string) bool {
 
 		} else {
 
-			golog.Err("OK filessize " + filessize)
+			golog.Info("OK filessize "+htmlfile  +" "+ filessize )
 			retbool = true
 
 		}
