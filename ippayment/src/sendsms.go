@@ -4,7 +4,6 @@ import (
 	"domains"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"io/ioutil"
 	"log"
@@ -56,7 +55,7 @@ func main() {
 
 			} else {
 
-				fmt.Println(smsout.Msisdn)
+//				fmt.Println(smsout.Msisdn)
 
 				if Url, err := url.Parse("http://79.125.27.200:9000"); err != nil {
 
@@ -73,7 +72,8 @@ func main() {
 					urlstr = Url.String()
 
 				}
-				fmt.Println(urlstr)
+//				fmt.Println(urlstr)
+				golog.Info(urlstr)
 				resp, err := http.Get(urlstr)
 				defer resp.Body.Close()
 				if err != nil {
