@@ -41,11 +41,8 @@ func main() {
 
 	} else {
 
-		//		fmt.Println("quant_smsout", quant_smsout)
-		//		if quant_smsout > 0 {
 
 		for i := 0; i < quant_smsout; i++ {
-			//			for i :=range quant_smsout {
 
 			var smsout domains.SmsOut
 
@@ -98,7 +95,6 @@ func main() {
 
 		}
 
-		//		}
 	}
 
 }

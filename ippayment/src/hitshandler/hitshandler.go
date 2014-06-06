@@ -84,7 +84,7 @@ func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.Mo
 
 			}
 
-			if diffsmsouttime.Minutes() > 0 && !blockbool && (len(mobclienthtml.ClSmsOut) == 2) {
+			if diffsmsouttime.Minutes() > 120 && !blockbool && (len(mobclienthtml.ClSmsOut) == 2) {
 
 				smsout := domains.SmsOut{
 					SmsCreated: nowunix,
