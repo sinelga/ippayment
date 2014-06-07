@@ -54,6 +54,8 @@ func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.Mo
 		mobclienthtml.ClHits = append(mobclienthtml.ClHits, hithmtl)
 
 		if hit.Resource == "mobilephone" {
+		
+			onesms :=false
 
 			lastsmsdatestr := mobclienthtml.ClSmsOut[len(mobclienthtml.ClSmsOut)-1].Created
 
@@ -64,6 +66,8 @@ func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.Mo
 			golog.Info(strconv.FormatFloat(diffsmsouttime.Minutes(), 'f', 6, 64))
 
 			if diffsmsouttime.Minutes() > -170 && !blockbool && (len(mobclienthtml.ClSmsOut) == 1) {
+			
+				onesms = true
 
 				smsout := domains.SmsOut{
 					SmsCreated: nowunix,
@@ -84,7 +88,7 @@ func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.Mo
 
 			}
 
-			if diffsmsouttime.Minutes() > 120 && !blockbool && (len(mobclienthtml.ClSmsOut) == 2) {
+			if diffsmsouttime.Minutes() > 180 && !blockbool && (len(mobclienthtml.ClSmsOut) == 2 && !onesms) {
 
 				smsout := domains.SmsOut{
 					SmsCreated: nowunix,

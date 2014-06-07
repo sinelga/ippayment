@@ -1,8 +1,8 @@
 #! /bin/bash
 #chmod +x!! must be done
-#*/2 * * * * /home/juno/git/ippayment/ippayment/crongofastscript.bash
+#*/2 * * * * /home/juno/git/ippayment/ippayment/cronhitshandlersendsms.bash
 
 cd /home/juno/git/ippayment/ippayment
 
-pgrep hitshandler || bin/hitshandler
-pgrep sendsms || bin/sendsms
+pgrep -x hitshandler || bin/hitshandler
+pgrep -x sendsms || bin/sendsms
