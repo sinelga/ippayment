@@ -82,12 +82,16 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 //	req.Header.Set("Content-Type", "application/json")
 //	req.Header.Set("Access-Control-Allow-Origin", "*")
-	resp.Header().Set("Access-Control-Allow-Origin", "*")
+//	resp.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if callback != "" && id != "" {
 
 		jsonstrtrue := jsonresponse.Response{"success": true, "msisdn": msisdn, "provider": provider}
+		
+		
 		fmt.Fprint(resp, callback+"("+jsonstrtrue.String()+");")
+		golog.Info("Set CORS")
+		resp.Header().Set("Access-Control-Allow-Origin", "*")
 
 	}
 
