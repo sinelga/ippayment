@@ -16,11 +16,7 @@ import (
 func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.MobClientHtml {
 
 	nowunix := time.Now().Unix()
-	//	c, err := redis.Dial("tcp", ":6379")
-	//	if err != nil {
-	//		golog.Crit(err.Error())
-	//	}
-
+	
 	htmlfile := string("/home/juno/git/ippayment/ippayment/www/tel/" + hit.Msisdn + ".html.gz")
 	var mobclienthtml domains.MobClientHtml
 	var smsouthtmlarr []domains.SmsOutHtml
@@ -30,15 +26,12 @@ func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.Mo
 	var blockbool bool
 	tvisit := time.Unix(hit.Created, 0)
 	tvisitstr := tvisit.Format("2006/01/02 15:04:05")
-	//	t := time.Now().Local()
 	t := time.Now()
 	tstr := t.Format("2006/01/02 15:04:05")
 
 	hithmtl := domains.HitHtml{Createdstr: tvisitstr, Site: hit.Site, Themes: hit.Themes, Resource: hit.Resource, Provider: hit.Provider}
 
 	if checkgzfileexist.CheckFile(golog, htmlfile) {
-
-		//		golog.Info(htmlfile + " Exist")
 
 		mobclienthtml = htmlhandler.ParseHtmlGzFile(golog, htmlfile)
 
@@ -123,7 +116,6 @@ func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.Mo
 
 	} else {
 
-		//		golog.Info(htmlfile + " Don't Exist")
 
 		if hit.Resource == "mobilephone" {
 
