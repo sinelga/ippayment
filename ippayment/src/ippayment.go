@@ -80,8 +80,9 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Access-Control-Allow-Origin", "*")
+//	req.Header.Set("Content-Type", "application/json")
+//	req.Header.Set("Access-Control-Allow-Origin", "*")
+	resp.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if callback != "" && id != "" {
 
