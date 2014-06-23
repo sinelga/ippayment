@@ -70,7 +70,7 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	resource := req.URL.Query().Get("resource")
 	themes := req.URL.Query().Get("themes")
 
-	golog.Info("id: " + id + " site: " + site + " resource: " + resource + " themes: " + themes + " provider: " + provider + " msisdn: " + msisdn)
+	golog.Info("id: " + id + " site: " + site + " resource: " + resource + " themes: " + themes + " provider: " + provider + " msisdn: " + msisdn + " ip: "+req.RemoteAddr)
 
 	if provider == "MobileSonera" && site != "" && id != "" && msisdn != "" && themes != "" && resource != "" {
 
