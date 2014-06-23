@@ -70,7 +70,7 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	resource := req.URL.Query().Get("resource")
 	themes := req.URL.Query().Get("themes")
 
-	golog.Info("id: " + id + " site: " + site + " resource: " + resource + " themes: " + themes + " provider: " + provider + " msisdn: " + msisdn + " ip: "+req.RemoteAddr)
+	golog.Info("id: " + id + " site: " + site + " resource: " + resource + " themes: " + themes + " provider: " + provider + " msisdn: " + msisdn + " ip: " + ipstr[0])
 
 	if provider == "MobileSonera" && site != "" && id != "" && msisdn != "" && themes != "" && resource != "" {
 
@@ -80,17 +80,10 @@ func (s FastCGIServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 	}
 
-	//	req.Header.Set("Content-Type", "application/json")
-	//	req.Header.Set("Access-Control-Allow-Origin", "*")
-	//	resp.Header().Set("Access-Control-Allow-Origin", "*")
-
 	if callback != "" && id != "" {
 
 		jsonstrtrue := jsonresponse.Response{"success": true, "msisdn": msisdn, "provider": provider}
-
 		fmt.Fprint(resp, callback+"("+jsonstrtrue.String()+");")
-		//		golog.Info("Set CORS")
-		//		resp.Header().Set("Access-Control-Allow-Origin", "*")
 
 	}
 

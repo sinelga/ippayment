@@ -108,9 +108,11 @@ func ElaborateHit(golog syslog.Writer, c redis.Conn, hit domains.Hit) domains.Mo
 		lastpaymentdate := timeconverter.StrToTime(lastpaymentdatestr)
 
 		diffpaymenttime := t.Sub(lastpaymentdate)
-		if diffpaymenttime.Minutes() > 43200 && !blockbool {
+		if diffpaymenttime.Minutes() > 129600 && !blockbool {
 
+			golog.Info("!!! next payment for "+hit.Msisdn)
 			mobclienthtml.ClPayments = append(mobclienthtml.ClPayments, makepayment.Pay(golog, hit.Msisdn, hit.Provider, "70", hit.Themes))
+			
 
 		}
 
